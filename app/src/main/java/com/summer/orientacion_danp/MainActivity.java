@@ -11,6 +11,8 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -25,12 +27,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView valuey;
     private TextView valuez;
 
+    private TextView maxX;
+    private TextView maxY;
+    private TextView maxZ;
+    private Button reiniciar;
+
+    private float maximox;
+    private float maximoy;
+    private float maximoz;
+
     float gravity[]={0,0,0};
     float linearAceleration[]={0,0,0};
     @Override
     protected void onResume() {
         super.onResume();
         miManager.registerListener(this,miSensorAcelerometro,SensorManager.SENSOR_DELAY_NORMAL);
+        maximox=0;
+        maximoy=0;
+        maximoz=0;
     }
 
     @Override
@@ -47,6 +61,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         valuex=findViewById(R.id.valorx);
         valuey=findViewById(R.id.valory);
         valuez=findViewById(R.id.valorz);
+
+        maxX=findViewById(R.id.maxX);
+        maxY=findViewById(R.id.maxY);
+        maxZ=findViewById(R.id.maxZ);
+        reiniciar=findViewById(R.id.button);
+
+        reiniciar.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                maxX.setText("0");
+                maxY.setText("0");
+                maxZ.setText("0");
+                maximox=0;
+                maximoy=0;
+                maximoz=0;
+            }
+        });
 
 
         miManager=(SensorManager)getSystemService(Context.SENSOR_SERVICE);
@@ -71,9 +103,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         valuey.setText(""+format.format(linearAceleration[1]));
         valuez.setText(""+format.format(linearAceleration[2]));
 
+
+        evaluarMaximos(linearAceleration[0],linearAceleration[1],linearAceleration[2]);
+
     }
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void evaluarMaximos( float x, float y, float z){
+        if(Math.abs(x)>Math.abs(maximox)){
+            maximox=x;
+        }
+        if (Math.abs(x)>Math.abs(maximoy)){
+            maximoy=y;
+        }
+        if (Math.abs(z)>Math.abs(maximoz)){
+            maximoz=z;
+        }
+        maxX.setText(String.valueOf(maximox));
+        maxY.setText(String.valueOf(maximoy));
+        maxZ.setText(String.valueOf(maximoz));
     }
 }
